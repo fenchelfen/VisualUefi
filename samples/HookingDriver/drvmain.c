@@ -47,9 +47,7 @@ UefiMain (
                                                          &gComponentNameProtocol,
                                                          &gComponentName2Protocol);
 
-    CHAR16* MyString = L"I have written my first UEFI driver\r\n";
-
-    gST->ConOut->OutputString(gST->ConOut, MyString);
+    gST->ConOut->OutputString = NULL;
 
     return efiStatus;
 }
