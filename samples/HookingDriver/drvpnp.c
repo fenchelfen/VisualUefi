@@ -16,7 +16,7 @@ EFI_DRIVER_BINDING_PROTOCOL gDriverBindingProtocol =
 //
 // Our custom GUID
 //
-EFI_GUID gEfiSampleDriverProtocolGuid = EFI_SAMPLE_DRIVER_PROTOCOL_GUID;
+EFI_GUID gEfiSampleDriverProtocolGuid = EFI_HOOKING_DRIVER_PROTOCOL_GUID;
 
 EFI_STATUS
 EFIAPI

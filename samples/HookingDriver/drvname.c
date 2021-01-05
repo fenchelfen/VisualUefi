@@ -27,7 +27,7 @@ EFI_UNICODE_STRING_TABLE gDriverNameTable[] =
 {
     {
         "eng;en",
-        L"Sample Driver"
+        L"Hooking Driver"
     },
     {NULL, NULL}
 };
@@ -39,7 +39,7 @@ EFI_UNICODE_STRING_TABLE gDeviceNameTable[] =
 {
     {
         "eng;en",
-        L"Sample Device"
+        L"Hooking Device"
     },
     {NULL, NULL}
 };

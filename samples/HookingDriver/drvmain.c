@@ -14,7 +14,7 @@ const UINT32 _gDxeRevision = 0x200;
 //
 // Our name
 //
-CHAR8 *gEfiCallerBaseName = "UefiDriver";
+CHAR8 *gEfiCallerBaseName = "HookingDriver";
 
 EFI_STATUS
 EFIAPI
@@ -26,6 +26,18 @@ UefiUnload (
     // Do not allow unload
     //
     return EFI_ACCESS_DENIED;
+}
+
+EFI_STATUS
+EFIAPI
+RandomStuff(
+    IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
+    IN CHAR16                                 *String
+    )
+{
+    // gST->ConOut->OutputString(This, String);
+
+    return 0;
 }
 
 EFI_STATUS
@@ -47,7 +59,11 @@ UefiMain (
                                                          &gComponentNameProtocol,
                                                          &gComponentName2Protocol);
 
-    gST->ConOut->OutputString = NULL;
+
+    // CHAR16* MyString = L"I have written my first UEFI driver\r\n";
+
+    gST->ConOut->OutputString = RandomStuff;
+    // gST->ConOut->OutputString(gST->ConOut, MyString);
 
     return efiStatus;
 }

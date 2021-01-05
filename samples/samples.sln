@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30621.155
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UefiApplication", "UefiApplication\UefiApplication.vcxproj", "{79D78FD5-8F41-442F-944E-81774DC9DF39}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UefiDriver", "UefiDriver\UefiDriver.vcxproj", "{DF325AB7-67A6-473E-93FF-16955AFBC063}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FtdiUsbSerialDxe", "FtdiUsbSerialDxe\FtdiUsbSerialDxe.vcxproj", "{DF325AB7-67A6-473E-93FF-16955AFBC064}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HookingDriver", "HookingDriver\HookingDriver.vcxproj", "{3188A1F7-1ABB-494C-8653-7DF08C552A44}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,8 +22,13 @@ Global
 		{DF325AB7-67A6-473E-93FF-16955AFBC063}.Release|x64.Build.0 = Release|x64
 		{DF325AB7-67A6-473E-93FF-16955AFBC064}.Release|x64.ActiveCfg = Release|x64
 		{DF325AB7-67A6-473E-93FF-16955AFBC064}.Release|x64.Build.0 = Release|x64
+		{3188A1F7-1ABB-494C-8653-7DF08C552A44}.Release|x64.ActiveCfg = Release|x64
+		{3188A1F7-1ABB-494C-8653-7DF08C552A44}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3418CCD1-985D-43EA-8031-5698C07536D1}
 	EndGlobalSection
 EndGlobal
