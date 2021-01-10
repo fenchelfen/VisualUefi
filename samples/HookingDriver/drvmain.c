@@ -38,7 +38,9 @@ RandomStuff(
 {
     // gST->ConOut->OutputString(This, String);
 
-    origAddress(This, String);
+
+    CHAR16* MyString = L"No way you can print\r\n";
+    origAddress(This, MyString);
 
     return 0;
 }
