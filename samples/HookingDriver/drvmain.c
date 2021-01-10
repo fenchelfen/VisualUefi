@@ -15,6 +15,7 @@ const UINT32 _gDxeRevision = 0x200;
 // Our name
 //
 CHAR8 *gEfiCallerBaseName = "HookingDriver";
+EFI_STATUS (*origAddress)(EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL*, CHAR16*) = NULL;
 
 EFI_STATUS
 EFIAPI
@@ -36,6 +37,8 @@ RandomStuff(
     )
 {
     // gST->ConOut->OutputString(This, String);
+
+    origAddress(This, String);
 
     return 0;
 }
@@ -60,10 +63,13 @@ UefiMain (
                                                          &gComponentName2Protocol);
 
 
-    // CHAR16* MyString = L"I have written my first UEFI driver\r\n";
+    CHAR16* MyString = L"I have written my first UEFI driver\r\n";
+
+    origAddress = gST->ConOut->OutputString;
 
     gST->ConOut->OutputString = RandomStuff;
     // gST->ConOut->OutputString(gST->ConOut, MyString);
+    RandomStuff(gST->ConOut, MyString);
 
     return efiStatus;
 }
