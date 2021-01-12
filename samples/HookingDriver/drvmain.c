@@ -67,10 +67,11 @@ UefiMain (
 
     CHAR16* MyString = L"I have written my first UEFI driver\r\n";
 
-    origAddress = gST->ConOut->OutputString;
+    gST->ConOut->OutputString(gST->ConOut, MyString);
 
+    origAddress = gST->ConOut->OutputString;
     gST->ConOut->OutputString = RandomStuff;
-    // gST->ConOut->OutputString(gST->ConOut, MyString);
+
     RandomStuff(gST->ConOut, MyString);
 
     return efiStatus;
