@@ -22,7 +22,9 @@ const UINT32 _gDxeRevision = 0x200;
 // Our name
 //
 CHAR8 *gEfiCallerBaseName = "HookingDriver";
+
 EFI_STATUS (*origAddress)(EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL*, CHAR16*) = NULL;
+EFI_BLOCK_READ blockIoOrigAddress;
 
 EFI_STATUS
 EFIAPI
@@ -38,15 +40,31 @@ UefiUnload (
 
 EFI_STATUS
 EFIAPI
+AnotherRandomStuff(
+    IN EFI_BLOCK_IO_PROTOCOL* This,
+    IN UINT32                 MediaId,
+    IN EFI_LBA                Lba,
+    IN UINTN                  BufferSize,
+    OUT VOID*                 Buffer
+)
+{
+    CHAR16* MyString = L"No way you can print\r\n";
+    gST->ConOut->OutputString(gST->ConOut, MyString);
+
+    //blockIoOrigAddress(This, MediaId, Lba, BufferSize, Buffer);
+
+    return 0;
+}
+
+
+EFI_STATUS
+EFIAPI
 RandomStuff(
     IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL        *This,
     IN CHAR16                                 *String
     )
 {
-    // gST->ConOut->OutputString(This, String);
-
-
-    CHAR16* MyString = L"No way you can print\r\n";
+    CHAR16 * MyString = L"No way you can print\r\n";
     origAddress(This, MyString);
 
     return 0;
@@ -76,17 +94,10 @@ EFIAPI
 ReadGpt(
 )
 {
-
     EFI_STATUS                  Status;
     EFI_BLOCK_IO_PROTOCOL* BlkIo;
     EFI_HANDLE* BlkIoHandle;
-    UINT32                      BlockSize;
-    UINTN                       Index;
     UINTN                       NoBlkIoHandles;
-    EFI_DEVICE_PATH_PROTOCOL* DevPath;
-    CHAR16* DevPathString;
-    EFI_PARTITION_TABLE_HEADER* PartHdr;
-    MASTER_BOOT_RECORD* PMBR;
 
     //
     // Locate Handles that support BlockIo protocol
@@ -102,75 +113,17 @@ ReadGpt(
         return Status;
     }
 
-    for (Index = 0; Index < NoBlkIoHandles; Index++) {
+    for (UINTN Index = 0; Index < NoBlkIoHandles; Index++) {
         Status = gBS->HandleProtocol(
             BlkIoHandle[Index],
             &gEfiBlockIoProtocolGuid,
             (VOID**)&BlkIo
         );
-        if (EFI_ERROR(Status)) {
-            continue;
-        }
-        if (BlkIo->Media->LogicalPartition) {  //if partition skip
-            continue;
-        }
-        DevPath = DevicePathFromHandle(BlkIoHandle[Index]);
-        if (DevPath == NULL) {
-            continue;
-        }
-        DevPathString = ConvertDevicePathToText(DevPath, TRUE, FALSE);
-        Print(L"%s \nMedia Id: %d, device type: %x, SubType: %x, logical: %x\n", \
-            DevPathString, BlkIo->Media->MediaId, DevPath->Type, DevPath->SubType, \
-            BlkIo->Media->LogicalPartition);
 
-        BlockSize = BlkIo->Media->BlockSize;
-        PartHdr = AllocateZeroPool(BlockSize);
-        PMBR = AllocateZeroPool(BlockSize);
-        //read LBA0
-        Status = BlkIo->ReadBlocks(
-            BlkIo,
-            BlkIo->Media->MediaId,
-            (EFI_LBA)0,							//LBA 0, MBR/Protetive MBR
-            BlockSize,
-            PMBR
-        );
-        //read LBA1
-        Status = BlkIo->ReadBlocks(
-            BlkIo,
-            BlkIo->Media->MediaId,
-            (EFI_LBA)1,							//LBA 1, GPT
-            BlockSize,
-            PartHdr
-        );
-        //check if GPT
-        if (PartHdr->Header.Signature == EFI_PTAB_HEADER_ID) {
-
-            if (PMBR->Signature == MBR_SIGNATURE) {
-                Print(L"Found Protetive MBR.\n");
-            }
-            Print(L"LBA 1,");
-            Print(L"GPT:\n");
-            //
-            //you can add some parse GPT data structure here
-            //
-            AppPrintBuffer((UINT16*)PartHdr);
-            Print(L"\n");
-        }
-        else {
-            if (PMBR->Signature == MBR_SIGNATURE) {
-                Print(L"LBA 0,");
-                Print(L"MBR:\n");
-                AppPrintBuffer((UINT16*)PMBR);
-                Print(L"\n");
-            }
-        }
-
-        FreePool(PartHdr);
-        FreePool(PMBR);
+		blockIoOrigAddress = BlkIo->ReadBlocks;
+		BlkIo->ReadBlocks = AnotherRandomStuff;
     }
 
-    //debug dump device path
-    //DumpDevicePath();
     return Status;
 }
 
