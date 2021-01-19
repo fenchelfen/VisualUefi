@@ -24,7 +24,8 @@ const UINT32 _gDxeRevision = 0x200;
 CHAR8 *gEfiCallerBaseName = "HookingDriver";
 
 EFI_STATUS (*origAddress)(EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL*, CHAR16*) = NULL;
-EFI_BLOCK_READ blockIoOrigAddress;
+EFI_BLOCK_READ ReadBlocksOrigAddress;
+EFI_BLOCK_WRITE WriteBlocksOrigAddress;
 
 EFI_STATUS
 EFIAPI
@@ -40,7 +41,7 @@ UefiUnload (
 
 EFI_STATUS
 EFIAPI
-AnotherRandomStuff(
+ReadBlocksRandomStaff(
     IN EFI_BLOCK_IO_PROTOCOL* This,
     IN UINT32                 MediaId,
     IN EFI_LBA                Lba,
@@ -48,12 +49,28 @@ AnotherRandomStuff(
     OUT VOID*                 Buffer
 )
 {
-    CHAR16* MyString = L"No way you can print\r\n";
-    gST->ConOut->OutputString(gST->ConOut, MyString);
 
-    //blockIoOrigAddress(This, MediaId, Lba, BufferSize, Buffer);
+    ReadBlocksOrigAddress(This, MediaId, Lba, BufferSize, Buffer);
 
     return 0;
+}
+
+EFI_STATUS
+EFIAPI
+WriteBlocksRandomStaff(
+    IN EFI_BLOCK_IO_PROTOCOL *This,
+    IN UINT32                 MediaId,
+    IN EFI_LBA                Lba,
+    IN UINTN                  BufferSize,
+    IN VOID                   *Buffer
+)
+{
+    //CHAR16* MyString = L"Write override\r\n";
+
+    //if (0 != StrCmp(Buffer, MyString)) 
+	//	gST->ConOut->OutputString(gST->ConOut, MyString);
+
+    return WriteBlocksOrigAddress(This, MediaId, Lba, BufferSize, Buffer);
 }
 
 
@@ -120,8 +137,10 @@ ReadGpt(
             (VOID**)&BlkIo
         );
 
-		blockIoOrigAddress = BlkIo->ReadBlocks;
-		BlkIo->ReadBlocks = AnotherRandomStuff;
+		ReadBlocksOrigAddress = BlkIo->ReadBlocks;
+		WriteBlocksOrigAddress = BlkIo->WriteBlocks;
+		// BlkIo->ReadBlocks = ReadBlocksRandomStaff;
+		BlkIo->WriteBlocks = WriteBlocksRandomStaff;
     }
 
     return Status;
